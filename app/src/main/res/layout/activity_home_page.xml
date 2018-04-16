@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
+    tools:context="com.ortaib.memorygame.homePageActivity">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="35dp"
+        android:id="@+id/happy_birthday"
+        android:text="Happy Birthday :)"
+        android:visibility="invisible"/>
+    <TextView
+        android:id="@+id/name_age"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Hello"
+        android:textSize="35dp"/>
+
+    <TextView
+        android:layout_marginTop="100dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Choose dificulty"
+        android:textSize="35dp"/>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/easy"
+        android:textSize="40dp"
+        android:text="3x3"
+        android:onClick="startEasyGame"/>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/medium"
+        android:textSize="40dp"
+        android:text="4x4"
+        android:onClick="startMediumGame"/>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/hard"
+        android:textSize="40dp"
+        android:text="5x5"
+        android:onClick="startHardGame"/>
+
+
+
+
+</LinearLayout>
