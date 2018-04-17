@@ -1,10 +1,12 @@
 package com.ortaib.memorygame;
 
 import android.app.DatePickerDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.nfc.Tag;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -22,6 +24,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView date;
     private DatePickerDialog.OnDateSetListener date_listener;
     private Calendar cal;
+    private boolean dateIsSet=false;
     private int year,month,day;
 
     @Override
@@ -50,21 +53,33 @@ public class MainActivity extends AppCompatActivity {
                 year=i1;
                 month=i2;
                 day=i3;
+                dateIsSet=true;
             }
         };
 
     }
 
     public void SendMessage(View view) {
-        EditText editText = (EditText)findViewById(R.id.name);
-        Intent intent = new Intent(this,homePageActivity.class);
-         intent.putExtra("name",editText.getText().toString());
-         intent.putExtra("year",this.year);
-         intent.putExtra("month",this.month);
-         intent.putExtra("day",this.day);
+        if(dateIsSet==true){
+            EditText editText = (EditText)findViewById(R.id.name);
+            Intent intent = new Intent(this,homePageActivity.class);
+            intent.putExtra("name",editText.getText().toString());
+            intent.putExtra("year",this.year);
+            intent.putExtra("month",this.month);
+            intent.putExtra("day",this.day);
+            startActivity(intent);
+        }
+        else {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert);
+            builder.setTitle("Date not set");
+            builder.setMessage("Date wasn't selected");
+             builder.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                }
+            });
+                 builder.setIcon(android.R.drawable.ic_dialog_alert);
+                 builder.show();
 
-
-        startActivity(intent);
-
+        }
     }
 }

@@ -22,7 +22,7 @@ import java.util.Random;
 
 
 public class GameActivity extends AppCompatActivity implements View.OnClickListener{
-    final private int EASY=133;
+    final private int EASY=110;
     final private int MEDIUM=100;
     final private int HARD=80;
     final private int MAX_NUM_OF_ELEMENTS=13;
@@ -90,9 +90,6 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         memoryCardGraphics[7] = R.drawable.button_8;
         memoryCardGraphics[8] = R.drawable.button_9;
         memoryCardGraphics[9] = R.drawable.button_10;
-        memoryCardGraphics[10] = R.drawable.button_11;
-        memoryCardGraphics[11] = R.drawable.button_12;
-        memoryCardGraphics[12] = R.drawable.button_13;
     }
     protected void setDp(int cols){
         if(cols==4) {

@@ -43,7 +43,7 @@ public class homePageActivity extends AppCompatActivity {
         Intent intent = new Intent(this, GameActivity.class);
         intent.putExtra("time", "" + 30);
         intent.putExtra("name", extras.get("name").toString());
-        intent.putExtra("rows", "" + 3);
+        intent.putExtra("rows", "" + 4);
         intent.putExtra("cols", "" + 3);
         intent.putExtra("year",this.year);
         intent.putExtra("month",this.month);
@@ -55,7 +55,7 @@ public class homePageActivity extends AppCompatActivity {
         Intent intent = new Intent(this, GameActivity.class);
         intent.putExtra("time", "" + 60);
         intent.putExtra("name", extras.get("name").toString());
-        intent.putExtra("rows", "" + 5);
+        intent.putExtra("rows", "" + 4);
         intent.putExtra("cols", "" + 5);
         intent.putExtra("year",this.year);
         intent.putExtra("month",this.month);
