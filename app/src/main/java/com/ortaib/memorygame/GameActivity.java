@@ -2,16 +2,24 @@ package com.ortaib.memorygame;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.CountDownTimer;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.AppCompatDrawableManager;
+import android.transition.Explode;
+import android.transition.Scene;
+import android.transition.Slide;
+import android.transition.Transition;
+import android.transition.TransitionManager;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -33,11 +41,11 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     private int timeleft, numOfElements, score = 0, dp;
     private String user_age, user_name;
     private Bundle extra;
-
+    private Context context=this;
     private MemoryCard[] cards;
     private int[] memoryCardGraphicsLocations;
     private int[] memoryCardGraphics;
-
+    private GridLayout grid;
     private MemoryCard card1, card2;
     private boolean isBusy, isTimesUp = false;
 
@@ -58,7 +66,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         year = extra.getInt("year");
         month = extra.getInt("month");
         day = extra.getInt("day");
-        GridLayout grid = (GridLayout) findViewById(R.id.board);
+        grid = (GridLayout) findViewById(R.id.board);
         grid.setColumnCount(numColumn);
         grid.setRowCount(numRows);
         numOfElements = numColumn * numRows;
@@ -124,7 +132,18 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onFinish() {
                 isTimesUp = true;
-                gameResult.setText("Time's up!");
+                final Rect viewRect = new Rect();
+                                Explode explode = new Explode();
+                                explode.setEpicenterCallback(new Transition.EpicenterCallback() {
+                    @Override
+                   public Rect onGetEpicenter(Transition transition) {
+                                                return viewRect;
+                                           }
+                });
+                                explode.setDuration(5000);
+                                LinearLayout l=(LinearLayout) findViewById(R.id.rootLayout);
+                                TransitionManager.go(Scene.getSceneForLayout(grid,R.layout.win_game,context),explode);
+                                gameResButton=(Button)findViewById(R.id.res_btn);gameResult = (TextView)findViewById(R.id.res_text);gameResult.setText("Time's up! Game Over!");
                 gameResButton.setText("Finish");
                 gameResButton.setVisibility(View.VISIBLE);
             }
@@ -177,6 +196,17 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 card1 = null;
                 score += 1;
                 if (score >= numOfElements / 2) {
+
+                    Slide slide=new Slide(Gravity.RIGHT);
+                    slide.setDuration(3000);
+                    /*Fade fade=new Fade();
+                    fade.setDuration(3000);*/
+                    LinearLayout l=(LinearLayout) findViewById(R.id.rootLayout);
+
+                    TransitionManager.go(Scene.getSceneForLayout(grid,R.layout.win_game,this), slide);
+                    gameResButton=(Button)findViewById(R.id.res_btn);
+                    gameResult = (TextView)findViewById(R.id.res_text);
+                    gameResult.setText("Congratulations! You won!");
                     gameResult.setText("Congratulation! you have won");
                     gameResButton.setVisibility(View.VISIBLE);
                     timer.cancel();
