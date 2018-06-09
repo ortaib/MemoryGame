@@ -22,6 +22,7 @@ import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
     private TextView date;
+    private TextView name;
     private DatePickerDialog.OnDateSetListener date_listener;
     private Calendar cal;
     private boolean dateIsSet=false;
@@ -31,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        name = (TextView)findViewById(R.id.name);
         date = (TextView)findViewById(R.id.dateofbirth);
         date.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -60,10 +62,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void SendMessage(View view) {
-        if(dateIsSet==true){
-            EditText editText = (EditText)findViewById(R.id.name);
+        if(dateIsSet==true && name.length() != 0 ){
             Intent intent = new Intent(this,homePageActivity.class);
-            intent.putExtra("name",editText.getText().toString());
+            intent.putExtra("name",name.getText().toString());
             intent.putExtra("year",this.year);
             intent.putExtra("month",this.month);
             intent.putExtra("day",this.day);
@@ -71,8 +72,14 @@ public class MainActivity extends AppCompatActivity {
         }
         else {
             AlertDialog.Builder builder = new AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert);
-            builder.setTitle("Date not set");
-            builder.setMessage("Date wasn't selected");
+            if(dateIsSet == false) {
+                builder.setTitle("Date not set");
+                builder.setMessage("Date wasn't selected");
+            }
+            else{
+                builder.setTitle("name not set");
+                builder.setMessage("name wasn't selected");
+            }
              builder.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
                 }
