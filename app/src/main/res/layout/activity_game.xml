@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rootLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -37,25 +38,29 @@
     <GridLayout
         android:id="@+id/board"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_gravity="center"
         android:layout_marginTop="30dp"
         android:stretchMode="spacingWidth"
-        android:useDefaultMargins="true">
+        android:useDefaultMargins="true"
+        android:layout_marginBottom="60dp"
+        >
 
     </GridLayout>
+
     <TextView
-        android:id="@+id/res_text"
+        android:id="@+id/res_text_loss"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="35dp"
-        android:gravity="center_horizontal"/>
+        android:gravity="top"/>
     <Button
-        android:id="@+id/res_btn"
+        android:id="@+id/res_btn_loss"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="35dp"
         android:visibility="gone"
+        android:gravity="bottom"
         android:onClick="backToHomePage"/>
 
 

@@ -2,22 +2,25 @@ package com.ortaib.memorygame;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
+import android.graphics.Rect;
 import android.os.CountDownTimer;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.AppCompatDrawableManager;
+import android.transition.Explode;
+import android.transition.Fade;
+import android.transition.Scene;
+import android.transition.Slide;
+import android.transition.Transition;
+import android.transition.TransitionManager;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.GridLayout;
-import android.widget.ImageButton;
-import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.os.Handler;
-import android.os.HandlerThread;
-import android.content.res.Resources;
 
-import java.util.Calendar;
 import java.util.Random;
 
 
@@ -33,13 +36,14 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     private int timeleft,numOfElements,score=0,dp;
     private String user_age,user_name;
     private Bundle extra;
-
+    private Context c=this;
     private MemoryCard[] cards;
     private int[] memoryCardGraphicsLocations;
     private int[] memoryCardGraphics;
 
     private MemoryCard card1,card2;
     private boolean isBusy,isTimesUp=false;
+    private GridLayout grid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,14 +54,14 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         name = findViewById(R.id.name);
         user_name = extra.get("name").toString();
         name.setText(user_name);
-        gameResButton=(Button)findViewById(R.id.res_btn);
-        gameResult = (TextView)findViewById(R.id.res_text);
+        gameResButton=(Button)findViewById(R.id.res_btn_loss);
+        gameResult = (TextView)findViewById(R.id.res_text_loss);
         int numRows = Integer.parseInt(extra.get("rows").toString());
         int numColumn = Integer.parseInt(extra.get("cols").toString());
         year=extra.getInt("year");
         month=extra.getInt("month");
         day=extra.getInt("day");
-        GridLayout grid =(GridLayout) findViewById(R.id.board);
+        grid =(GridLayout) findViewById(R.id.board);
         grid.setColumnCount(numColumn);
         grid.setRowCount(numRows);
         numOfElements =  numColumn*numRows;
@@ -117,7 +121,20 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onFinish() {
                 isTimesUp=true;
-                gameResult.setText("Time's up!");
+                final Rect viewRect = new Rect();
+                Explode explode = new Explode();
+                explode.setEpicenterCallback(new Transition.EpicenterCallback() {
+                    @Override
+                    public Rect onGetEpicenter(Transition transition) {
+                        return viewRect;
+                    }
+                });
+                explode.setDuration(5000);
+                LinearLayout l=(LinearLayout) findViewById(R.id.rootLayout);
+                TransitionManager.go(Scene.getSceneForLayout(grid,R.layout.win_game,c),explode);
+                gameResButton=(Button)findViewById(R.id.res_btn);
+                gameResult = (TextView)findViewById(R.id.res_text);
+                gameResult.setText("Time's up! Game Over!");
                 gameResButton.setText("Finish");
                 gameResButton.setVisibility(View.VISIBLE);
             }
@@ -140,10 +157,11 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     }
     @Override
     public void onClick(View view) {
+        final Rect viewRect = new Rect();
+        view.getGlobalVisibleRect(viewRect);
         if(!isTimesUp) {
             if (isBusy)
                 return;
-
             MemoryCard card = (MemoryCard) view;
 
             if (card.isMatched())
@@ -167,10 +185,27 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 card.setEnabled(false);
                 card1 = null;
                 score += 1;
-                if (score >= numOfElements / 2) {
-                    gameResult.setText("Congratulation! you have won");
+                if (score >= numOfElements / 2||true) {
+
+
+                    Slide slide=new Slide(Gravity.RIGHT);
+                    slide.setDuration(3000);
+
+                    /*Fade fade=new Fade();
+                    fade.setDuration(3000);*/
+                    LinearLayout l=(LinearLayout) findViewById(R.id.rootLayout);
+
+                    //setContentView(R.layout.win_game);
+                    //grid.setVisibility(View.INVISIBLE);
+                    //grid.removeAllViews();
+                    TransitionManager.go(Scene.getSceneForLayout(grid,R.layout.win_game,this), slide);
+                    gameResButton=(Button)findViewById(R.id.res_btn);
+                    gameResult = (TextView)findViewById(R.id.res_text);
+                    gameResult.setText("Congratulations! You won!");
                     gameResButton.setText("Finish");
                     gameResButton.setVisibility(View.VISIBLE);
+
+
                     timer.cancel();
 
                 }
