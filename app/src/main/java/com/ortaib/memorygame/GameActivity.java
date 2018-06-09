@@ -185,7 +185,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 card.setEnabled(false);
                 card1 = null;
                 score += 1;
-                if (score >= numOfElements / 2||true) {
+                if (score >= numOfElements / 2) {
 
 
                     Slide slide=new Slide(Gravity.RIGHT);
