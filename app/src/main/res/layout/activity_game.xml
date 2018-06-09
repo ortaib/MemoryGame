@@ -7,6 +7,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center_horizontal"
+    android:background="@drawable/imgbgg"
     tools:context="com.ortaib.memorygame.GameActivity">
 
     <RelativeLayout
@@ -33,6 +34,16 @@
             android:text="Timer"
             android:textSize="40dp" />
 
+        <TextView
+            android:id="@+id/score"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:gravity="center_horizontal"
+            android:text="Score"
+            android:textSize="40dp" />
+
     </RelativeLayout>
 
     <GridLayout
@@ -49,13 +60,13 @@
     </GridLayout>
 
     <TextView
-        android:id="@+id/res_text_loss"
+        android:id="@+id/res_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="35dp"
         android:gravity="top"/>
     <Button
-        android:id="@+id/res_btn_loss"
+        android:id="@+id/res_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="35dp"
