@@ -62,6 +62,7 @@ public class homePageActivity extends AppCompatActivity {
         intent.putExtra("day",this.day);
         startActivity(intent);
     }
+    //
     public int getAge(int year,int month,int day){
         Calendar cal = Calendar.getInstance();
         int age = cal.get(Calendar.YEAR)-year-1;
