@@ -10,6 +10,7 @@ import java.util.Calendar;
 
 public class homePageActivity extends AppCompatActivity {
     private Bundle extras;
+    private String name;
     private int year,month,day,age;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,6 +22,7 @@ public class homePageActivity extends AppCompatActivity {
         year=extras.getInt("year");
         month=extras.getInt("month");
         day=extras.getInt("day");
+        name = extras.getString("name");
         age = getAge(year,month,day);
         if(isBirthday(month,day)){
             TextView birthday = (TextView)findViewById(R.id.happy_birthday);
@@ -80,6 +82,11 @@ public class homePageActivity extends AppCompatActivity {
                 return true;
         }
         return false;
+    }
+    public void moveToScoreboard(View view){
+        Intent intent = new Intent(this,ScoreBoard.class);
+        intent.putExtra("name",name);
+        startActivity(intent);
     }
 
 }

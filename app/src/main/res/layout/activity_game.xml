@@ -59,21 +59,4 @@
 
     </GridLayout>
 
-    <TextView
-        android:id="@+id/res_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="35dp"
-        android:gravity="top"/>
-    <Button
-        android:id="@+id/res_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="35dp"
-        android:visibility="gone"
-        android:gravity="bottom"
-        android:onClick="backToHomePage"/>
-
-
-
 </LinearLayout>

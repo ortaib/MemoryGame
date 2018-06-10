@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">MemoryGame</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="title_activity_map">Map</string>
+    <string name="google_maps_key">AIzaSyB3CoVcgwbKJeIZkKMDTo4MpewOwLKYeiY</string>
+    <string name="google_maps_api_key">AIzaSyB3CoVcgwbKJeIZkKMDTo4MpewOwLKYeiY</string>
+
 </resources>

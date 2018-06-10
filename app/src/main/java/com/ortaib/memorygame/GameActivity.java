@@ -1,10 +1,19 @@
 package com.ortaib.memorygame;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.CountDownTimer;
+import android.provider.Settings;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.AppCompatDrawableManager;
@@ -13,9 +22,11 @@ import android.transition.Scene;
 import android.transition.Slide;
 import android.transition.Transition;
 import android.transition.TransitionManager;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.GridLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -24,6 +35,7 @@ import android.widget.TextView;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.content.res.Resources;
+import android.widget.Toast;
 
 import java.util.Calendar;
 import java.util.Random;
@@ -35,9 +47,18 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     final private int HARD = 80;
     final private int MAX_NUM_OF_ELEMENTS = 13;
     int year, month, day;
+    DatabaseHelper myDatabaseHelper;
+    final private String TAG = "GameActivity";
+
+    private final static int LOCATION_PERMISSION_REQUEST_CODE = 1234,ERROR_DIALOG_REQUEST = 9001;
+    private double latitude,longitude;
+    private boolean locationPermissionGranted=false;
+    private LocationManager locationManager;
+    private LocationListener locationListener;
+
     private CountDownTimer timer;
     private TextView timerText, name, gameResult, scoreTextView;
-    private Button gameResButton;
+    private Button gameResButton,scorebtn;
     private int timeleft, numOfElements, score = 0, dp;
     private String user_age, user_name;
     private Bundle extra;
@@ -58,14 +79,38 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         name = findViewById(R.id.name);
         user_name = extra.get("name").toString();
         name.setText(user_name);
+        myDatabaseHelper = new DatabaseHelper(this);
         gameResButton = (Button) findViewById(R.id.res_btn);
         gameResult = (TextView) findViewById(R.id.res_text);
         scoreTextView = (TextView) findViewById(R.id.score);
         int numRows = Integer.parseInt(extra.get("rows").toString());
         int numColumn = Integer.parseInt(extra.get("cols").toString());
+        scorebtn = (Button)findViewById(R.id.scoreboard);
         year = extra.getInt("year");
         month = extra.getInt("month");
         day = extra.getInt("day");
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        locationListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+                latitude = location.getLatitude();
+                longitude = location.getLongitude();
+            }
+
+            @Override
+            public void onStatusChanged(String s, int i, Bundle bundle) {
+            }
+            @Override
+            public void onProviderEnabled(String s) {
+            }
+            @Override
+            public void onProviderDisabled(String s) {
+                Intent i = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                startActivity(i);
+            }
+        };
+        getLocationPermission();
+        getDeviceLocation();
         grid = (GridLayout) findViewById(R.id.board);
         grid.setColumnCount(numColumn);
         grid.setRowCount(numRows);
@@ -132,7 +177,9 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onFinish() {
                 isTimesUp = true;
-                final Rect viewRect = new Rect();
+                //getview by id linear layout
+
+                final Rect viewRect = new Rect(400,600,200,300);
                                 Explode explode = new Explode();
                                 explode.setEpicenterCallback(new Transition.EpicenterCallback() {
                     @Override
@@ -143,9 +190,13 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                                 explode.setDuration(5000);
                                 LinearLayout l=(LinearLayout) findViewById(R.id.rootLayout);
                                 TransitionManager.go(Scene.getSceneForLayout(grid,R.layout.win_game,context),explode);
-                                gameResButton=(Button)findViewById(R.id.res_btn);gameResult = (TextView)findViewById(R.id.res_text);gameResult.setText("Time's up! Game Over!");
-                gameResButton.setText("Finish");
+                                //gameResButton=(Button)findViewById(R.id.res_btn);
+                                gameResult = (TextView)findViewById(R.id.res_text);
+
+                gameResult.setText("Time's up! Game Over!");
+               /* gameResButton.setText("Finish");
                 gameResButton.setVisibility(View.VISIBLE);
+                scorebtn.setText("Score Board");*/
             }
         };
         timer.start();
@@ -207,12 +258,13 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                     gameResButton=(Button)findViewById(R.id.res_btn);
                     gameResult = (TextView)findViewById(R.id.res_text);
                     gameResult.setText("Congratulations! You won!");
-                    gameResult.setText("Congratulation! you have won");
-                    gameResButton.setVisibility(View.VISIBLE);
+                    //gameResButton.setVisibility(View.VISIBLE);
+                   // scorebtn.setVisibility(View.VISIBLE);
                     timer.cancel();
                     isBusy=true;
                     finalScore();
-                    gameResButton.setText("Finish");
+                    addData(user_name,score,latitude,longitude);
+                    //gameResButton.setText("Finish");
                 }
                 scoreTextView.setText("" + score);
             } else {
@@ -266,6 +318,73 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         }, 100);
 
 
+    }
+    public void addData(String name,int score, double latitude,double longitude){
+        boolean insertData =  myDatabaseHelper.addData(name,score,latitude,longitude);
+        if(insertData){
+            toastMessage("Data successfully inserted");
+        }else{
+            toastMessage("Something went wrong");
+        }
+    }
+    private void toastMessage(String message){
+        Toast.makeText(this,message,Toast.LENGTH_SHORT).show();
+    }
+    private void getDeviceLocation(){
+        Log.d(TAG, "getDeviceLocation: getting the device current location");
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        if(locationPermissionGranted){
+            try{
+                @SuppressLint("MissingPermission") Location currentLocation = locationManager.getLastKnownLocation(locationManager.GPS_PROVIDER);
+                latitude = currentLocation.getLatitude();
+                longitude = currentLocation.getLongitude();
+            }catch(SecurityException e){
+                Log.e(TAG, "getDeviceLocation: SecurityException: "+e.getMessage());
+            }
+        }
+    }
+    private void getLocationPermission() {
+        Log.d(TAG, "getLocationPermission: requesting permissions");
+        String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION};
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)
+        {
+            locationPermissionGranted = true;
+        } else {
+            ActivityCompat.requestPermissions(this, new String[]{
+                            Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION,
+                            Manifest.permission.INTERNET, Manifest.permission.ACCESS_NETWORK_STATE},
+                    LOCATION_PERMISSION_REQUEST_CODE);
+        }
+        locationManager.requestLocationUpdates("gps", 5000, 0, locationListener);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        Log.d(TAG, "onRequestPermissionResult: called");
+
+        locationPermissionGranted = false;
+        switch (requestCode) {
+            case LOCATION_PERMISSION_REQUEST_CODE:
+                if (grantResults.length > 0) {
+                    for (int i = 0; i < grantResults.length; i++) {
+                        if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
+                            locationPermissionGranted = false;
+                            Log.d(TAG, "onRequestPermissionResult: permission failed");
+                            return;
+                        }
+                    }
+                    Log.d(TAG, "onRequestPermissionResult: permission granted ");
+                    locationPermissionGranted = true;
+                }
+        }
+    }
+    public void moveToScoreboard(View view){
+        Intent intent = new Intent(this,ScoreBoard.class);
+        intent.putExtra("latitude",latitude);
+        intent.putExtra("longitude",longitude);
+        startActivity(intent);
     }
 }
 
