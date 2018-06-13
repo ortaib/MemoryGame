@@ -181,7 +181,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             public void onTick(long l) {
                 timeleft--;
                 timerText.setText("" + (int) l / 1000);
-                if(isBound&&l/1000%2==0&&aService.isOnPosition())
+                if(isBound&&l/1000%2==0&&!aService.isOnPosition())
                     unFlip();
                 //Toast.makeText(context,"I AM ON POS",Toast.LENGTH_LONG).show();
 
@@ -437,7 +437,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
            stCards.peek().getC2().setMatched(false);
            stCards.peek().getC1().setEnabled(true);
            stCards.peek().getC2().setEnabled(true);
-           stCards.peek().getC2().flip();
+           stCards.peek().getC1().flip();
            stCards.peek().getC2().flip();
            stCards.pop();
            score--;
