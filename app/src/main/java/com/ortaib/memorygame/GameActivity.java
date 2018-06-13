@@ -2,14 +2,19 @@ package com.ortaib.memorygame;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.graphics.Rect;
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.CountDownTimer;
+import android.os.IBinder;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -31,6 +36,7 @@ import android.os.Handler;
 import android.widget.Toast;
 
 import java.util.Random;
+import java.util.Stack;
 
 
 public class GameActivity extends AppCompatActivity implements View.OnClickListener {
@@ -62,10 +68,22 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     private MemoryCard card1, card2;
     private boolean isBusy, isTimesUp = false;
 
+    private Sensor mSensor;
+    private SensorManager mSensorManager;
+    private AccelService aService;
+    boolean isBound=false;
+
+    private Stack<PairCard> stCards=new Stack<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
+
+        //Binding Service via localbinder
+        Intent aI=new Intent(this,AccelService.class);
+        bindService(aI,aConnection,Context.BIND_AUTO_CREATE);
+
         Intent intent = getIntent();
         extra = intent.getExtras();
         name = findViewById(R.id.name);
@@ -163,6 +181,9 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             public void onTick(long l) {
                 timeleft--;
                 timerText.setText("" + (int) l / 1000);
+                if(isBound&&l/1000%2==0&&aService.isOnPosition())
+                    unFlip();
+                //Toast.makeText(context,"I AM ON POS",Toast.LENGTH_LONG).show();
 
             }
 
@@ -230,6 +251,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
             if (card1.getFrontDrawableId() == card.getFrontDrawableId()) {
                 card.flip();
+                stCards.push(new PairCard(card1,card));
 
                 card1.setMatched(true);
                 card.setMatched(true);
@@ -280,11 +302,12 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
     public void backToHomePage(View view) {
         if(isBusy==false) {
-            Intent intent = new Intent(this, HomePageActivity.class);
+            Intent intent = new Intent(this, homePageActivity.class);
             intent.putExtra("name", user_name);
             intent.putExtra("year", this.year);
             intent.putExtra("month", this.month);
             intent.putExtra("day", this.day);
+            unbindService(aConnection);
             startActivity(intent);
         }
 
@@ -374,10 +397,52 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
     public void moveToScoreboard(View view){
-        Intent intent = new Intent(this,ScoreBoardActivity.class);
+        Intent intent = new Intent(this,ScoreBoard.class);
         intent.putExtra("latitude",latitude);
         intent.putExtra("longitude",longitude);
         startActivity(intent);
+    }
+    private ServiceConnection aConnection=new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            AccelService.LocalAccelBinder binder=(AccelService.LocalAccelBinder) iBinder;
+            aService = binder.getService();
+            isBound=true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+            isBound=false;
+        }
+    };
+    private class PairCard{
+        private MemoryCard c1,c2;
+        PairCard(MemoryCard card1,MemoryCard card2){
+            c1=card1;
+            c2=card2;
+        }
+
+        public MemoryCard getC1() {
+            return c1;
+        }
+
+        public MemoryCard getC2() {
+            return c2;
+        }
+    }
+    private void unFlip(){
+        if(!stCards.empty())
+        {
+           stCards.peek().getC1().setMatched(false);
+           stCards.peek().getC2().setMatched(false);
+           stCards.peek().getC1().setEnabled(true);
+           stCards.peek().getC2().setEnabled(true);
+           stCards.peek().getC2().flip();
+           stCards.peek().getC2().flip();
+           stCards.pop();
+           score--;
+           scoreTextView.setText("" + score);
+        }
     }
 }
 

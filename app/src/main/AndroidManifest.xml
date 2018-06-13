@@ -39,12 +39,19 @@
 
         <meta-data
             android:name="com.google.android.gms.version"
-            android:value="@integer/google_play_services_version"/>
-
+            android:value="@integer/google_play_services_version" />
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyB3CoVcgwbKJeIZkKMDTo4MpewOwLKYeiY" />
 
+        <service
+            android:name=".AccelService"
+            android:enabled="true"
+            android:exported="true" />
+        <service
+            android:name=".AService"
+            android:enabled="true"
+            android:exported="true"></service>
     </application>
 
 </manifest>
