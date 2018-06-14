@@ -68,8 +68,6 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     private MemoryCard card1, card2;
     private boolean isBusy, isTimesUp = false;
 
-    private Sensor mSensor;
-    private SensorManager mSensorManager;
     private AccelService aService;
     boolean isBound=false;
 
@@ -181,9 +179,15 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             public void onTick(long l) {
                 timeleft--;
                 timerText.setText("" + (int) l / 1000);
-                if(isBound&&l/1000%2==0&&!aService.isOnPosition())
-                    unFlip();
-                //Toast.makeText(context,"I AM ON POS",Toast.LENGTH_LONG).show();
+                if(isBound&&l/1000%3==0)
+                {
+                    if(!aService.isOnPosition())
+                    {
+                        Toast.makeText(context,"Please return your phone angle to start position",Toast.LENGTH_SHORT).show();
+                        unFlip();
+                    }
+                }
+
 
             }
 
@@ -203,7 +207,6 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                                 explode.setDuration(5000);
                                 LinearLayout l=(LinearLayout) findViewById(R.id.rootLayout);
                                 TransitionManager.go(Scene.getSceneForLayout(grid,R.layout.win_game,context),explode);
-                                //gameResButton=(Button)findViewById(R.id.res_btn);
                                 gameResult = (TextView)findViewById(R.id.res_text);
 
                 gameResult.setText("Time's up! Game Over!");
@@ -272,12 +275,9 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                     gameResButton=(Button)findViewById(R.id.res_btn);
                     gameResult = (TextView)findViewById(R.id.res_text);
                     gameResult.setText("Congratulations! You won!");
-                    //gameResButton.setVisibility(View.VISIBLE);
-                   // scorebtn.setVisibility(View.VISIBLE);
                     timer.cancel();
                     isBusy=true;
                     finalScore();
-                    //gameResButton.setText("Finish");
                 }
                 scoreTextView.setText("" + score);
             } else {

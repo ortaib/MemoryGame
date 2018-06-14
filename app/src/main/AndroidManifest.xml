@@ -21,9 +21,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".homePageActivity" />
-        <activity android:name=".GameActivity" />
-        <activity android:name=".ScoreBoard" />
+        <activity android:name=".homePageActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".GameActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".ScoreBoard"
+            android:screenOrientation="portrait"/>
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").

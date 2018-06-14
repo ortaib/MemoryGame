@@ -76,7 +76,6 @@ public class AccelService extends Service implements SensorEventListener{
       @Override
       public void onCreate() {
           mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-          //add this line only
       }
     public class LocalAccelBinder extends Binder{
         AccelService getService(){
